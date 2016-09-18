@@ -18,7 +18,7 @@ import com.leonickel.stickgame.model.Statistic;
 import com.leonickel.stickgame.service.StatisticService;
 import com.leonickel.stickgame.util.PropertyFinder;
 
-@Path("/statistics")
+@Path("/service/statistics")
 public class StatisticServiceRest {
 
 	@Inject
@@ -30,6 +30,7 @@ public class StatisticServiceRest {
 	@Path("/{userId}/")
 	public Response listByUser(@PathParam("userId") String userId) {
 		try {
+			System.out.println("GET chegou");
 			return Response.status(SC_OK)
 					.entity(gson.toJson(statisticService.getStatisticByUser(userId)))
 					.header("Content-Type", "application/json")
@@ -44,6 +45,7 @@ public class StatisticServiceRest {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateStatisticByUser(@PathParam("userId") String userId, String statisticJSON) {
 		try {
+			System.out.println("PUT chegou");
 			Statistic statistic = statisticService.updateStatisticByUser(userId, gson.fromJson(statisticJSON, Statistic.class));
 			return Response.status(SC_OK)
 					.entity(gson.toJson(statistic))

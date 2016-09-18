@@ -2,7 +2,14 @@ package com.leonickel.stickgame.util;
 
 public enum DefaultProperties {
 	
-	ERROR_CONTENT_TYPE("movingimage.error.content-type", "text/plain"),
+	REDIS_SERVER_URL("gameduell.redis.server.url", "localhost"),
+	REDIS_SERVER_PORT("gameduell.redis.server.port", "6379"),
+	REDIS_SERVER_MAX_TOTAL_CONNECTIONS("gameduell.redis.server.max-total-connections", "5000"),
+	REDIS_SERVER_MAX_IDLE("gameduell.redis.server.max-idle", "100"),
+	REDIS_SERVER_MIN_IDLE("gameduell.redis.server.min-idle", "10"),
+	REDIS_SERVER_MAX_WAIT_IN_MILLIS("gameduell.redis.server.max-wait-in-millis", "5000"),
+	
+	ERROR_CONTENT_TYPE("gameduell.error.content-type", "text/plain"),
 	;
 	
 	private String property;
