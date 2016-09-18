@@ -8,12 +8,10 @@ public class RestModule implements Module {
 
 	@Override
 	public void configure(Binder binder) {
-
 		//Dependency Injection creation
 		binder.install(new DependencyInjector());
 		
 		//Rest API binds
 		binder.bind(StatisticServiceRest.class);
 	}
-
 }

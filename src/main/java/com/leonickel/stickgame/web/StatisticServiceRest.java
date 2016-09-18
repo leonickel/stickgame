@@ -1,6 +1,7 @@
 package com.leonickel.stickgame.web;
 
-import static com.leonickel.stickgame.util.DefaultProperties.ERROR_CONTENT_TYPE;
+import static com.leonickel.stickgame.util.DefaultProperties.*;
+import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 
@@ -12,8 +13,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.leonickel.stickgame.exception.GlobalStatisticNotFoundException;
+import com.leonickel.stickgame.exception.UserStatisticNotFoundException;
 import com.leonickel.stickgame.model.Statistic;
 import com.leonickel.stickgame.service.StatisticService;
 import com.leonickel.stickgame.util.PropertyFinder;
@@ -23,20 +29,38 @@ public class StatisticServiceRest {
 
 	@Inject
 	private StatisticService statisticService;
-	
+
+	private final Logger logger = LoggerFactory.getLogger(StatisticServiceRest.class);
 	private final Gson gson = new Gson();
-	
+
+	@GET
+	@Path("/")
+	public Response getGlobalStatistic() {
+		try {
+			return Response.status(SC_OK)
+					.entity(gson.toJson(statisticService.getGlobalStatistic()))
+					.header("Content-Type", PropertyFinder.getPropertyValue(SUCCESS_CONTENT_TYPE))
+					.build();
+		} catch (GlobalStatisticNotFoundException e) {
+			return writeErrorResponse(e.getMessage(), SC_NOT_FOUND);
+		} catch (Exception e) {
+			return writeErrorResponse(e.getMessage(), SC_INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@GET
 	@Path("/{userId}/")
-	public Response listByUser(@PathParam("userId") String userId) {
+	public Response getByUser(@PathParam("userId") String userId) {
 		try {
-			System.out.println("GET chegou");
 			return Response.status(SC_OK)
 					.entity(gson.toJson(statisticService.getStatisticByUser(userId)))
-					.header("Content-Type", "application/json")
+					.header("Content-Type", PropertyFinder.getPropertyValue(SUCCESS_CONTENT_TYPE))
 					.build();
-		} catch (Exception e) { //TODO write custom exceptions
-			return writeErrorResponse(e.getMessage(), SC_NOT_FOUND);
+		} catch (UserStatisticNotFoundException e) {
+			logger.info("statistics for user: [{}] not found, returning empty response in order to avoid errors on frontend integration", userId);
+			return writeEmptyResponse(SC_OK);
+		} catch (Exception e) {
+			return writeErrorResponse(e.getMessage(), SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 	
@@ -45,38 +69,29 @@ public class StatisticServiceRest {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateStatisticByUser(@PathParam("userId") String userId, String statisticJSON) {
 		try {
-			System.out.println("PUT chegou");
-			Statistic statistic = statisticService.updateStatisticByUser(userId, gson.fromJson(statisticJSON, Statistic.class));
+			final Statistic statistic = statisticService.updateStatisticByUser(userId, gson.fromJson(statisticJSON, Statistic.class));
 			return Response.status(SC_OK)
 					.entity(gson.toJson(statistic))
-					.header("Content-Type", "application/json")
+					.header("Content-Type", PropertyFinder.getPropertyValue(SUCCESS_CONTENT_TYPE))
 					.build();
-		} catch (Exception e) { //TODO write custom exceptions
-			return writeErrorResponse(e.getMessage(), SC_NOT_FOUND);
+		} catch (Exception e) {
+			return writeErrorResponse(e.getMessage(), SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-//	private Response writeImageResponse(VideoDetailDTO videoDetails, String dimension) throws Exception {
-//		return Response
-//				.status(SC_OK)
-//				.header("Content-Type", PropertyFinder.getPropertyValue(IMAGE_CONTENT_TYPE))
-//				.entity(responseService.getImageResponse(videoDetails, dimension))
-//				.build();
-//	}
-//	
-//	private Response writeHtmlResponse(VideoDetailDTO videoDetails) throws Exception {
-//		return Response
-//				.status(SC_OK)
-//				.header("Content-Type", PropertyFinder.getPropertyValue(HTML_CONTENT_TYPE))
-//				.entity(responseService.getHtmlResponse(videoDetails))
-//				.build();
-//	}
-//	
 	private Response writeErrorResponse(String message, int statusCode) {
 		return Response
 				.status(statusCode)
 				.header("Content-Type", PropertyFinder.getPropertyValue(ERROR_CONTENT_TYPE))
 				.entity(message)
+				.build();
+	}
+	
+	private Response writeEmptyResponse(int statusCode) {
+		return Response
+				.status(statusCode)
+				.header("Content-Type", PropertyFinder.getPropertyValue(SUCCESS_CONTENT_TYPE))
+				.entity(gson.toJson(new Statistic()))
 				.build();
 	}
 }

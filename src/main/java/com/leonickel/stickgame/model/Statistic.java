@@ -5,6 +5,14 @@ public class Statistic {
 	private int totalWon;
 	private int totalLost;
 	
+	public Statistic() {
+	}
+	
+	public Statistic(int totalWon, int totalLost) {
+		this.totalWon = totalWon;
+		this.totalLost = totalLost;
+	}
+	
 	public int getTotalWon() {
 		return totalWon;
 	}
@@ -17,6 +25,4 @@ public class Statistic {
 	public void setTotalLost(int totalLost) {
 		this.totalLost = totalLost;
 	}
-	
-	
 }

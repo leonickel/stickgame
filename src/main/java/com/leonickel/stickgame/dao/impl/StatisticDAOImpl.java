@@ -19,16 +19,16 @@ import com.leonickel.stickgame.util.PropertyFinder;
 public class StatisticDAOImpl implements StatisticDAO {
 
 	private final JedisPool jedisPool = createJedisPool();
-	private Gson gson = new Gson();
+	private final Gson gson = new Gson();
 	
 	@Override
-	public Statistic getStatisticByUser(String userId) {
-		return gson.fromJson(jedisPool.getResource().get(appendPrefix(userId)), Statistic.class);
+	public Statistic getStatisticByKey(String key) {
+		return gson.fromJson(jedisPool.getResource().get(appendPrefix(key)), Statistic.class);
 	}
 
 	@Override
-	public Statistic updateStatisticByUser(String userId, Statistic statistic) {
-		jedisPool.getResource().set(appendPrefix(userId), gson.toJson(statistic));
+	public Statistic updateStatisticByKey(String key, Statistic statistic) {
+		jedisPool.getResource().set(appendPrefix(key), gson.toJson(statistic));
 		return statistic;
 	}
 

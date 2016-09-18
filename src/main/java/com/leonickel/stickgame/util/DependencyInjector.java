@@ -13,7 +13,5 @@ public class DependencyInjector extends AbstractModule {
 		//Service and DAO classes
 		bind(StatisticService.class).to(StatisticServiceImpl.class);
 		bind(StatisticDAO.class).to(StatisticDAOImpl.class);
-		
-		//Response implementation
 	}
 }
