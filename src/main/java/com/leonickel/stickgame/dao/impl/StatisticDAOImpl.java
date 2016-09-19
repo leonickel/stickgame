@@ -32,6 +32,14 @@ public class StatisticDAOImpl implements StatisticDAO {
 		return statistic;
 	}
 
+	/**
+	 * For unit testing purpose only
+	 * @param key key to me removed
+	 */
+	public void removeKey(String key) {
+		jedisPool.getResource().del(appendPrefix(key));
+	}
+
 	private String appendPrefix(String key) {
 		return new StringBuilder("tsg:").append(key).toString();
 	}

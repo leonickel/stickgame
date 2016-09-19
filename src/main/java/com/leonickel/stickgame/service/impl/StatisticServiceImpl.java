@@ -93,4 +93,9 @@ public class StatisticServiceImpl implements StatisticService {
 	private String getGlobalStatisticKey() {
 		return PropertyFinder.getPropertyValue(DefaultProperties.GLOBAL_STATISTIC_KEY);
 	}
+	
+	//For unit testing purposes
+	public void setStatisticDAO(StatisticDAO statisticDAO) {
+		this.statisticDAO = statisticDAO;
+	}
 }
