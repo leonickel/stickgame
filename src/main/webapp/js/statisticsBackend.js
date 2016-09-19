@@ -1,6 +1,6 @@
 TSG = window.TSG || {};
 
-TSG.StatisticsLocalStorage = function(options) {
+TSG.StatisticsBackend = function(options) {
 
 	var _userLogged = $('#txtLogin').val();
     var _stats = { won: 0, lost: 0 };

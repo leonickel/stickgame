@@ -28,7 +28,7 @@ public class StatisticDAOImpl implements StatisticDAO {
 
 	@Override
 	public Statistic updateStatisticByKey(String key, Statistic statistic) {
-		jedisPool.getResource().set(appendPrefix(key), gson.toJson(statistic));
+		jedisPool.getResource().set(appendPrefix(key), gson.toJson(statistic)); //Setting key without ttl, which means, store this data forever until redis gets full
 		return statistic;
 	}
 

@@ -97,27 +97,17 @@ $(window).load(function() {
 
     $('#game').hide();
 
-    // number of sticks you can take at most at once
-/*     TSG.maxSticksToTake = 3;
-    // number of currently available sticks to take
-    TSG.currentSticks = 0;
-    // statistics about lost and won games
-    TSG.stats = new TSG.StatisticsLocalStorage({
-        onChange : function(stats) {
-            updateStatistics(stats);
-        }
-    });
- */    
     $('#btnLogin').on('click', function(){
     	$('#myModal').modal('hide');
     	
     	$('#loggedUserLabel').text($('#txtLogin').val())
         
+    	// number of sticks you can take at most at once
         TSG.maxSticksToTake = 3;
         // number of currently available sticks to take
         TSG.currentSticks = 0;
         // statistics about lost and won games
-        TSG.stats = new TSG.StatisticsLocalStorage({
+        TSG.stats = new TSG.StatisticsBackend({
             onChange : function(stats) {
                 updateStatistics(stats);
             }
@@ -198,16 +188,21 @@ $(window).load(function() {
 
     // FACEBOOK related calls
 
+    function publishVictory(stats) {
+    	FB.login(function(){
+   		  // Note: The call will only work if you accept the permission request
+   		  FB.api('/me/feed', 'post', {message: stats.totalWon + 'games won!'});
+		}, {scope: 'publish_actions'});
+    }
+
     function statusChangeCallback(response) {
         if (response.status === 'connected') {
             FB.api('/me', function(resp) {
                 $('#login').html('Logged in as: ' + resp.first_name);
             });
         } else if (response.status === 'not_authorized') {
-            alert('not_authorized')
             // The person is logged into Facebook, but not your app.
         } else {
-            alert('else')
             // The person is not logged into Facebook, so we're not sure if
             // they are logged into this app or not.
         }
@@ -222,10 +217,10 @@ $(window).load(function() {
     // init FB
     window.fbAsyncInit = function () {
         FB.init({
-            appId      : '{your-app-id}',
+            appId: '346547425679278',
             cookie: true,
             xfbml: true,
-            version: 'v2.0'
+            version: 'v2.7'
         });
 
         FB.getLoginStatus(function (response) {
