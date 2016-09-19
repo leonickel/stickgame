@@ -28,7 +28,7 @@ At this section I'll list and explain which technologies I've chosen to work on:
 ## Motivations
 The system was designed to be simple but at the same time using approaches to help easy understanding, maintain and improve the system like some other production should have. Below there's a list of mindsets that guided implementation:
 * Rest API - I've created a simple REST API using RestEasy. The main goal of this is to create semantic APIs and returning correct response including HTTP Status code and so on.
-* Key/Value database - I've implemented this application using a key/value database to get a easy data access using userId or globalStatistic depending on the flow. Every time a user win/lost the total amount is updated in database and returned in the API  
+* Key/Value database - I've implemented this application using a key/value database to get a easy data access using userId or globalStatistic depending on the flow. Every time a user win/lost the total amount is updated in database and returned in the API.
 * Logging - every production application must have logging for troubleshooting and to know used parameters on each flow and so on.
 * Exceptions handling - the code is supported by an exception mechanism controlling the flow. This approach needs more code (creating custom exceptions and check all exceptions) but lets the system more robust.
 * IoC - Using IoC (Inversion of Control) mechanism helps to not creating a lot of objects in memory and avoiding large footprints besides code gets simpler as well. 
@@ -36,7 +36,22 @@ The system was designed to be simple but at the same time using approaches to he
 
 ## APIs Documentation
 * GET /service/statistics/ - returns global statistics data, including total amount of win, lost and win ratio
+```console
+{
+	"wonRatio": 72.22,
+	"totalWon": 13,
+	"totalLost": 5
+}
+```
+
 * GET /service/statistics/{userId}/ - this API receives a userId as pathParam and returning the win and lost amounts for the informed user
+```console
+{
+	"totalWon": 5,
+	"totalLost": 2
+}
+```
+
 * PUT /service/statistics/{userId}/ - this API receives a JSON input in the following format and updates win/lost data for the informed user:
 ```console
 {
@@ -44,20 +59,21 @@ The system was designed to be simple but at the same time using approaches to he
 	"totalLost": 0
 }
 ```
+Note: this API was designed to receive at same time totalWon and totalLost because depending on the frontend implementation, it can avoid calling backend in every game, so frontend can accumulate some played games and call when it should be a good time passing all sum values. The implementation I've made in frontend is calling backend every time a game is ended, though.
 
 ## How to run
 To run the system it's mandatory to have installed and running Redis [http://redis.io/]. After installed and started, Redis should be running at localhost:6379. This is the default URL and PORT the application will try to connect at startup. If your Redis was installed in a different url and port, you can provide this information at startup using environment parameters. Below I'll show an example of providing them.
 
-The system produces a war file and can be easily started by calling embedded jetty into maven, so to run you just need Maven and Java installed on machine. After setting up them, just run the following command:
+The system produces a war file and can be easily started by calling embedded jetty into maven, so to run you just need Maven and Java installed on machine. After setting up them, just run the following command in the ROOT application directory:
 > `mvn clean install jetty:run`
 
 ```console
 [INFO] Started ServerConnector@36570936{HTTP/1.1}{0.0.0.0:8080}
 [INFO] Started Jetty Server
 ```
-When the lines above appear in the console the application is up and running to start receiving requests
+When the lines above appear in the console the application is up and running to start receiving requests.
 
-To provide alternative Redis URL and PORT during startup, you can run the following command:
+To provide alternate Redis URL and PORT during startup, you can run the following command:
 > `mvn clean install -Dgameduell.redis.server.url=localhost -Dgameduell.redis.server.port=6379 jetty:run` 
 
 
@@ -65,16 +81,19 @@ To provide alternative Redis URL and PORT during startup, you can run the follow
 To start using the application without calling REST APIs directly, you can access the frontend, just access the follow url:
 * http://localhost:8080/stickgame/
 
-Note: I'm not so experienced with frontend applications, so I've just made a few changes in files you've sent it to me including a modal to capture login and Ajax implementation to calling REST APIs in the backend. I've tried to implement a facebook post, but I've not concluded this step, sorry about that.
+Note: I'm not so experienced with frontend applications, so I've made just a few changes in the files you've sent me including a modal to capture login, a label in the header to show logged user and Ajax implementation to calling REST APIs in the backend. I've tried to implement a facebook post, but I've not concluded this step, sorry about that.
 
 ## API Requests examples
 * http://localhost:8080/stickgame/service/statistics/
+
 This GET call will retrieve a global statistics about winning and losses including win ratio. If there is no global statistic, the application will return 404 status code with a message "global statistics not found"
 
 * http://localhost:8080/stickgame/service/statistics/{userId}
+
 This GET call will retrieve a statistics about winning and losses for provided userId. If there is no statistic related to this user, the application will inform it in log and return a response with zero values in json in order to help frontend avoid doing additional validations.
 
 * PUT http://localhost:8080/stickgame/service/statistics/{userId}
+
 This PUT method will receive a json with totalWon and totalLost values, retrieve an already stored values for this user (if exists), sum and update key on redis database. Below an example of calling this API with curl:
 > `curl -v -H "Content-Type: application/json" -X PUT http://localhost:8080/stickgame/service/statistics/leo -d'{"totalWon":1,"totalLost":0}'`
 
