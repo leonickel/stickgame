@@ -32,7 +32,7 @@ The system was designed to be simple but at the same time using approaches to he
 * Logging - every production application must have logging for troubleshooting and to know used parameters on each flow and so on.
 * Exceptions handling - the code is supported by an exception mechanism controlling the flow. This approach needs more code (creating custom exceptions and check all exceptions) but lets the system more robust.
 * IoC - Using IoC (Inversion of Control) mechanism helps to not creating a lot of objects in memory and avoiding large footprints besides code gets simpler as well. 
-* Unit tests - To make sure all the corner cases were coverage including code coverage.
+* Unit tests - To make sure all the corner cases were coverage including code coverage. I've implemented some unit tests to cover flows in DAO and Service classes ;)
 
 ## APIs Documentation
 * GET /service/statistics/ - returns global statistics data, including total amount of win, lost and win ratio
